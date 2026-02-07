@@ -2,10 +2,13 @@ import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DownloadButton from "./DownloadButton";
+import { useTranslation } from 'react-i18next';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function NavHero() {
+    const { t } = useTranslation();
+
     const heroInnerRef = useRef<HTMLDivElement>(null);
     const logoRef = useRef<HTMLDivElement>(null);
     const buttonsRef = useRef<HTMLDivElement>(null);
@@ -14,7 +17,7 @@ export default function NavHero() {
         const ctx = gsap.context(() => {
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: "body", // Outside smoother, so we watch the body
+                    trigger: "body",
                     start: "top top",
                     end: "500",
                     scrub: true,
@@ -75,9 +78,9 @@ export default function NavHero() {
                     className="absolute top-2/5 left-8/12 -translate-x-1/2 -translate-y-1/2 flex gap-6 font-bold items-center"
                     style={{ transform: 'translate(-50%, 100%)' }} // Initial Hero Position (Lower)
                 >
-                    <button className="text-white/80 hover:text-white">Tutorial</button>
-                    <button className="text-white/80 hover:text-white">Reseñas</button>
-                    <DownloadButton>Descargalo</DownloadButton>
+                    <button className="text-white/80 hover:text-white">{t('tutorial')}</button>
+                    <button className="text-white/80 hover:text-white">{t('reviews')}</button>
+                    <DownloadButton>{t('download')}</DownloadButton>
                 </div>
 
             </div>
