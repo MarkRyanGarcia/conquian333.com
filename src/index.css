@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Arial, "Helvetica", Arial, sans-serif;
+  font-family: 'Poppins', Arial, "Helvetica", Arial, sans-serif;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--color-offwhite);
+  /* background-color: var(--color-table-green-2); */
+  background: linear-gradient(135deg,rgba(44, 155, 98, 1) 0%, rgba(2, 15, 8, 1) 100%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -14,6 +15,9 @@
 }
 
 @theme {
+    --color-offwhite: rgba(255, 255, 255, 0.87);
+    --color-offwhite-2: rgba(255, 255, 255, 0.67);
     --color-table-green: #006847;
+    --color-table-green-2: #003927;
     --color-table-red: #CE1127;
 }
