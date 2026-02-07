@@ -28,7 +28,7 @@ export default function Hero() {
                     <div className='h-[50vh]'></div>
                     {/* <div className='box w-30 bg-red-500 h-30' data-speed={0.5}></div> */}
                     <img src='./coin256.png' className='box w-30' data-speed={0.5}></img>
-                    <div className='h-[150vh]' ></div>
+                    <div className='h-screen' ></div>
                 </div>
             </main>
         </div>

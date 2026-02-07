@@ -2,35 +2,33 @@ import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
-import Hero from './components/Hero';
-import Navbar from './components/Navbar';
+import Navbar from './components/NavHero';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 export default function App() {
-    const container = useRef<HTMLElement>(null);
+    const wrapper = useRef<HTMLDivElement>(null);
+    const content = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!container.current) return;
-
         const smoother = ScrollSmoother.create({
-            wrapper: container.current,
-            content: container.current.children[0],
+            wrapper: wrapper.current,
+            content: content.current,
             smooth: 1,
             effects: true,
         });
-
-        return () => {
-            smoother.kill();
-        };
+        return () => smoother.kill();
     }, []);
 
     return (
-        <main ref={container}>
-            <div>
-                <Navbar />
-                <Hero />
+        <>
+            <Navbar /> 
+
+            <div ref={wrapper} id="smooth-wrapper">
+                <div ref={content} id="smooth-content">
+                    <div className='h-[300vh] '></div>
+                </div>
             </div>
-        </main>
+        </>
     );
 }
