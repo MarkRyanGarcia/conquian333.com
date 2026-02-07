@@ -15,7 +15,7 @@ export default function NavHero() {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            const wrapperWidth = heroRef.current?.offsetWidth || window.innerWidth;
+            // const wrapperWidth = heroRef.current?.offsetWidth || window.innerWidth;
 
             const tl = gsap.timeline({
                 scrollTrigger: {
