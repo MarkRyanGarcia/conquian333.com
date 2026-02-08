@@ -1,10 +1,7 @@
 import { useRef, useEffect } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslation } from "react-i18next";
 import DownloadButton from "./DownloadButton";
-import { useTranslation } from 'react-i18next';
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap } from 'gsap';
 
 export default function NavHero() {
     const { t } = useTranslation();
@@ -15,8 +12,6 @@ export default function NavHero() {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // const wrapperWidth = heroRef.current?.offsetWidth || window.innerWidth;
-
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: heroRef.current,
@@ -26,25 +21,25 @@ export default function NavHero() {
                 }
             });
 
-            // Shrink hero height
+            // shrink hero
             tl.to(heroRef.current, {
-                height: "110px",
-                backdropFilter: "blur(10px)",
+                height: 110,
+                // backdropFilter: "blur(10px)",
                 ease: "none"
             }, 0);
 
-            // Move logo to left on desktop, slightly scale down
+            // move logo to left-top corner
             tl.to(logoRef.current, {
-                xPercent: -50,
-                yPercent: 0,
+                x: () => -window.innerWidth / 2.8,
+                y: 10,
                 scale: 0.7,
                 ease: "none"
             }, 0);
 
-            // Move buttons to right on desktop, scale down
+            // move buttons to right-top corner
             tl.to(buttonsRef.current, {
-                xPercent: 50,
-                yPercent: 0,
+                x: () => window.innerWidth / 4,
+                y: 0,
                 scale: 0.8,
                 ease: "none"
             }, 0);
@@ -54,26 +49,26 @@ export default function NavHero() {
     }, []);
 
     return (
-        <nav className="fixed top-0 left-0 w-full z-50 pointer-events-none">
+        <nav className="fixed top-0 left-0 w-full z-50">
             <div
                 ref={heroRef}
-                className="w-full max-w-7xl mx-auto h-screen flex flex-col md:flex-row items-center justify-center relative overflow-hidden px-4"
+                className="w-full h-screen relative overflow-hidden px-4"
             >
                 {/* LOGO */}
                 <div
                     ref={logoRef}
-                    className="flex flex-col md:flex-row items-center gap-4 absolute md:relative"
-                    style={{ top: "30%", left: "50%", transform: "translate(-50%, -50%)" }}
+                    className="absolute flex items-center gap-4"
+                    style={{ top: "40%", left: "50%", transform: "translate(-50%, -50%)" }}
                 >
                     <img src="./coin256.png" className="h-16 md:h-20" alt="logo" />
-                    <h1 className="text-3xl md:text-6xl font-bold text-white text-center md:text-left">Conquian 333</h1>
+                    <h1 className="text-3xl md:text-6xl font-bold text-white">Conquian 333</h1>
                 </div>
 
                 {/* BUTTONS */}
                 <div
                     ref={buttonsRef}
-                    className="flex flex-col sm:flex-row gap-4 sm:gap-6 font-bold items-center absolute md:relative mt-4 md:mt-0"
-                    style={{ top: "55%", left: "50%", transform: "translate(-50%, -50%)" }}
+                    className="absolute flex gap-4 sm:gap-6 font-bold items-center"
+                    style={{ top: "48%", left: "55%", transform: "translate(-50%, -50%)" }}
                 >
                     <button className="text-white/80 hover:text-white">{t('tutorial')}</button>
                     <button className="text-white/80 hover:text-white">{t('reviews')}</button>
