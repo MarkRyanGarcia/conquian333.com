@@ -12,13 +12,20 @@ export default function App() {
     const content = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const smoother = ScrollSmoother.create({
-            wrapper: wrapper.current,
-            content: content.current,
-            smooth: 1,
-            effects: true,
+        const mm = gsap.matchMedia();
+    
+        mm.add("(min-width: 768px)", () => {
+            const smoother = ScrollSmoother.create({
+                wrapper: wrapper.current,
+                content: content.current,
+                smooth: 1,
+                effects: true,
+            });
+    
+            return () => smoother.kill();
         });
-        return () => smoother.kill();
+    
+        return () => mm.revert();
     }, []);
 
     return (

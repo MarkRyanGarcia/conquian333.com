@@ -27,7 +27,7 @@ export default function Description() {
     return (
         <section title='description' className='relative flex flex-col max-w-5xl justify-center pt-[100vh] items-center mx-auto'>
             <main ref={desc}>
-                <div className='flex justify-between w-full mx-auto'>
+                <div className='flex flex-col-reverse md:flex-row gap-10 justify-between w-full mx-auto'>
                     <img src='./01.png' className='phone w-100' data-speed={0.67}></img>
                     <div className='flex flex-col gap-2 just'>
                         <h2 className='w-full text-3xl font-bold'>
