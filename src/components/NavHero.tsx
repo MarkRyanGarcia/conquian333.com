@@ -33,8 +33,8 @@ export default function NavHero() {
     
                 // move logo to left-top corner
                 tl.to(logoRef.current, {
-                    x: () => -window.innerWidth / 2.8,
-                    y: 10,
+                    x: () => -window.innerWidth / 4,
+                    y: 20,
                     scale: 0.7,
                     ease: "none"
                 }, 0);
@@ -42,7 +42,7 @@ export default function NavHero() {
                 // move buttons to right-top corner
                 tl.to(buttonsRef.current, {
                     x: () => window.innerWidth / 4,
-                    y: 0,
+                    y: -60,
                     scale: 0.8,
                     ease: "none"
                 }, 0);
