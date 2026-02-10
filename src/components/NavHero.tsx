@@ -23,29 +23,35 @@ export default function NavHero() {
                         scrub: true,
                     }
                 });
-
+    
+                // shrink hero
                 tl.to(heroRef.current, {
                     height: 110,
+                    // backdropFilter: "blur(10px)",
                     ease: "none"
                 }, 0);
-
+    
+                // move logo to left-top corner
                 tl.to(logoRef.current, {
-                    y: -((heroRef.current?.offsetHeight || 0) / 2) + 60,
+                    x: () => -window.innerWidth / 2.8,
+                    y: 10,
                     scale: 0.7,
-                    transformOrigin: "center center",
                     ease: "none"
                 }, 0);
-
+    
+                // move buttons to right-top corner
                 tl.to(buttonsRef.current, {
-                    y: -((heroRef.current?.offsetHeight || 0) / 2) + 60,
+                    x: () => window.innerWidth / 4,
+                    y: 0,
                     scale: 0.8,
-                    transformOrigin: "center center",
                     ease: "none"
                 }, 0);
             });
 
             return () => ctx.revert();
         });
+
+        
 
         mm.add("(max-width: 767px)", () => {
             const ctx = gsap.context(() => {
