@@ -23,14 +23,13 @@ export default function NavHero() {
                         scrub: true,
                     }
                 });
-    
+
                 // shrink hero
                 tl.to(heroRef.current, {
                     height: 110,
-                    // backdropFilter: "blur(10px)",
                     ease: "none"
                 }, 0);
-    
+
                 // move logo to left-top corner
                 tl.to(logoRef.current, {
                     x: () => -window.innerWidth / 4,
@@ -38,7 +37,7 @@ export default function NavHero() {
                     scale: 0.7,
                     ease: "none"
                 }, 0);
-    
+
                 // move buttons to right-top corner
                 tl.to(buttonsRef.current, {
                     x: () => window.innerWidth / 4,
@@ -51,9 +50,7 @@ export default function NavHero() {
             return () => ctx.revert();
         });
 
-        
-
-        mm.add("(max-width: 767px)", () => {    
+        mm.add("(max-width: 767px)", () => {
             const ctx = gsap.context(() => {
                 const tl = gsap.timeline({
                     scrollTrigger: {
@@ -94,7 +91,7 @@ export default function NavHero() {
         <nav className="fixed top-0 left-0 w-full z-50">
             <div
                 ref={heroRef}
-                className="w-full h-screen relative overflow-hidden flex flex-col items-center justify-center px-4"
+                className="w-full h-[80vh] md:h-[60vh] relative overflow-hidden flex flex-col items-center justify-center px-4"
             >
                 <div
                     ref={logoRef}
