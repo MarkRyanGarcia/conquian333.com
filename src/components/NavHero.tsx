@@ -53,7 +53,7 @@ export default function NavHero() {
 
         
 
-        mm.add("(max-width: 767px)", () => {
+        mm.add("(max-width: 767px)", () => {    
             const ctx = gsap.context(() => {
                 const tl = gsap.timeline({
                     scrollTrigger: {
@@ -65,19 +65,19 @@ export default function NavHero() {
                 });
 
                 tl.to(heroRef.current, {
-                    height: 80,
+                    height: 120,
                     ease: "none"
                 }, 0);
 
                 tl.to(logoRef.current, {
-                    yPercent: -120,
+                    yPercent: -20,
                     scale: 0.75,
                     transformOrigin: "center center",
                     ease: "none"
                 }, 0);
 
                 tl.to(buttonsRef.current, {
-                    yPercent: -120,
+                    yPercent: -100,
                     scale: 0.85,
                     transformOrigin: "center center",
                     ease: "none"
