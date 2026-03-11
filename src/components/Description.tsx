@@ -23,11 +23,11 @@ export default function Description() {
     )
 
     return (
-        <section title='description' className='relative flex flex-col max-w-5xl justify-center pt-300 items-center mx-auto'>
+        <section title='description' className='relative flex flex-col max-w-5xl justify-center pt-70 md:pt-300 items-center mx-auto'>
             <main ref={desc}>
                 <div className='header flex flex-col-reverse md:flex-row gap-10 justify-between items-center w-full mx-auto' data-speed={0.27}>
                     <img src='./01.png' className='phone w-100'></img>
-                    <div className='flex flex-col gap-2 just'>
+                    <div className='flex flex-col gap-2 p-5'>
                         <h2 className='w-full text-3xl font-bold'>
                             {t("the_classic_card_game")}
                         </h2>   

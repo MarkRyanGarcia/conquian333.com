@@ -91,7 +91,7 @@ export default function NavHero() {
         <nav className="fixed top-0 left-0 w-full z-50">
             <div
                 ref={heroRef}
-                className="w-full h-[80vh] md:h-[60vh] relative overflow-hidden flex flex-col items-center justify-center px-4"
+                className="w-full h-[45vh] md:h-[60vh] relative overflow-hidden flex flex-col items-center justify-center px-4"
             >
                 <div
                     ref={logoRef}
