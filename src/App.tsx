@@ -33,7 +33,7 @@ export default function App() {
             <NavHero />
             <div ref={wrapper} id="smooth-wrapper">
                 <div ref={content} id="smooth-content">
-                    <div className="h-[40vh]"></div>
+                    {/* <div className="h-[0vh]"></div> */}
                     <Description />
                     <div className="h-[300vh]"></div>
                 </div>

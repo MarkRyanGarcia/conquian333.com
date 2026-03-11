@@ -107,8 +107,8 @@ export default function NavHero() {
                     ref={buttonsRef}
                     className="mt-6 flex gap-4 sm:gap-6 font-bold items-center justify-center w-full"
                 >
-                    <button className="text-white/80 hover:text-white">{t('tutorial')}</button>
-                    <button className="text-white/80 hover:text-white">{t('reviews')}</button>
+                    <button className="text-white/80 hover:text-white cursor-pointer">{t('tutorial')}</button>
+                    <button className="text-white/80 hover:text-white cursor-pointer">{t('reviews')}</button>
                     <DownloadButton>{t('download')}</DownloadButton>
                 </div>
             </div>
