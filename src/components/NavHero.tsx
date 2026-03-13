@@ -4,11 +4,14 @@ import DownloadButton from "./DownloadButton";
 import { gsap } from 'gsap';
 
 export default function NavHero() {
-    const { t } = useTranslation();
-
+    const { t, i18n } = useTranslation();
     const heroRef = useRef<HTMLDivElement>(null);
     const logoRef = useRef<HTMLDivElement>(null);
     const buttonsRef = useRef<HTMLDivElement>(null);
+
+    const changeLanguage = (lng: string) => {
+        i18n.changeLanguage(lng);
+    };
 
     useEffect(() => {
         const mm = gsap.matchMedia();
@@ -24,13 +27,8 @@ export default function NavHero() {
                     }
                 });
 
-                // shrink hero
-                tl.to(heroRef.current, {
-                    height: 110,
-                    ease: "none"
-                }, 0);
+                tl.to(heroRef.current, { height: 110, ease: "none" }, 0);
 
-                // move logo to left-top corner
                 tl.to(logoRef.current, {
                     x: () => -window.innerWidth / 4,
                     y: 20,
@@ -38,7 +36,6 @@ export default function NavHero() {
                     ease: "none"
                 }, 0);
 
-                // move buttons to right-top corner
                 tl.to(buttonsRef.current, {
                     x: () => window.innerWidth / 4,
                     y: -60,
@@ -46,7 +43,6 @@ export default function NavHero() {
                     ease: "none"
                 }, 0);
             });
-
             return () => ctx.revert();
         });
 
@@ -61,26 +57,20 @@ export default function NavHero() {
                     }
                 });
 
-                tl.to(heroRef.current, {
-                    height: 120,
-                    ease: "none"
-                }, 0);
+                tl.to(heroRef.current, { height: 100, ease: "none" }, 0);
 
                 tl.to(logoRef.current, {
-                    yPercent: -20,
-                    scale: 0.75,
-                    transformOrigin: "center center",
+                    y: -20,
+                    scale: 0.7,
                     ease: "none"
                 }, 0);
 
                 tl.to(buttonsRef.current, {
-                    yPercent: -100,
-                    scale: 0.85,
-                    transformOrigin: "center center",
+                    y: 25,
+                    scale: 0.75,
                     ease: "none"
                 }, 0);
             });
-
             return () => ctx.revert();
         });
 
@@ -93,22 +83,33 @@ export default function NavHero() {
                 ref={heroRef}
                 className="w-full h-[45vh] md:h-[60vh] relative overflow-hidden flex flex-col items-center justify-center px-4"
             >
-                <div
-                    ref={logoRef}
-                    className="flex items-center gap-3 md:gap-4 justify-center w-full"
-                >
-                    <img src="./coin256.png" className="h-12 md:h-20" />
-                    <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white">
+                <div ref={logoRef} className="flex items-center gap-3 md:gap-4 justify-center w-full">
+                    <img src="./coin256.png" className="h-10 md:h-20" alt="logo" />
+                    <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold text-white">
                         Conquian 333
                     </h1>
                 </div>
 
                 <div
                     ref={buttonsRef}
-                    className="mt-6 flex gap-4 sm:gap-6 font-bold items-center justify-center w-full"
+                    className="mt-6 flex flex-nowrap gap-3 sm:gap-6 font-bold items-center justify-center w-full"
                 >
-                    <button className="text-white/80 hover:text-white cursor-pointer">{t('tutorial')}</button>
-                    <button className="text-white/80 hover:text-white cursor-pointer">{t('reviews')}</button>
+                    <button className="text-white/80 hover:text-white text-xs sm:text-base cursor-pointer">
+                        {t('tutorial')}
+                    </button>
+
+                    <div className="flex items-center bg-white/10 rounded-lg px-2 py-1 border border-white/20">
+                        <select
+                            onChange={(e) => changeLanguage(e.target.value)}
+                            value={i18n.language}
+                            className="bg-transparent text-white text-sm outline-none cursor-pointer appearance-none px-2"
+                        >
+                            <option value="en" className="text-black">EN</option>
+                            <option value="es" className="text-black">ES</option>
+                        </select>
+                        <span className="text-white/40 text-xs pointer-events-none">▼</span>
+                    </div>
+
                     <DownloadButton>{t('download')}</DownloadButton>
                 </div>
             </div>
