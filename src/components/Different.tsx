@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Description() {
+export default function Different() {
     const { t } = useTranslation();
     const desc = useRef(null)
     useGSAP(
@@ -23,32 +23,31 @@ export default function Description() {
     )
 
     return (
-        <section title='description' className='relative flex flex-col max-w-5xl justify-center pt-70 md:pt-227 items-center mx-auto pointer-events-none'>
+        <section title='different' className='relative flex flex-col max-w-5xl justify-center pt-70 md:pt-227 items-center mx-auto pointer-events-none'>
             <main ref={desc}>
-                <div className='header flex flex-col md:flex-row gap-10 justify-between items-center w-full mx-auto' data-speed={0.4}>
+                <div className='header flex flex-col-reverse md:flex-row gap-10 justify-between items-center w-full mx-auto'>
+                    <img src='./02.png' className='phone w-100'></img>
                     <div className='flex flex-col gap-2 p-5'>
                         <h2 className='w-full text-3xl font-bold'>
-                            {t("the_classic_card_game")}
+                            {t("conquian_is_different")}
                         </h2>
-                        <h3 className='font-bold'>
-                            {t("created_with_100p_mexican_talent")}
-                        </h3>
                         <ul>
                             <li>
-                                {t("play_online")}
+                                - {t("shuffled_in_3d")}
                             </li>
                             <li>
-                                {t("play_conquian_against_the_computer")}
+                                - {t("tilt_your_phone")}
                             </li>
                             <li>
-                                {t("save_your_wins_losses_and_standings_in_the_cloud")}
+                                - {t("hd_quality")}
+                            </li>
+                            <li>
+                                - {t("only_valid_plays")}
                             </li>
                         </ul>
                     </div>
-                    <img src='./01.png' className='phone w-100'></img>
                 </div>
             </main>
         </section>
     )
 }
-

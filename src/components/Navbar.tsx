@@ -60,13 +60,13 @@ export default function NavHero() {
                 tl.to(heroRef.current, { height: 100, ease: "none" }, 0);
 
                 tl.to(logoRef.current, {
-                    y: -20,
+                    y: 0,
                     scale: 0.7,
                     ease: "none"
                 }, 0);
 
                 tl.to(buttonsRef.current, {
-                    y: 25,
+                    y: -30,
                     scale: 0.75,
                     ease: "none"
                 }, 0);
