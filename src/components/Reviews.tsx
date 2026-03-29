@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { useStoreData } from '../hooks/useStoreData'
-import type { Review } from '../../api/reviews'
+import type { Review } from '../types/storeData'
 
 gsap.registerPlugin(ScrollTrigger)
 

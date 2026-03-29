@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { StoreData } from '../../api/reviews'
+import type { StoreData } from '../types/storeData'
 
 interface UseStoreDataResult {
   data: StoreData | null
@@ -13,7 +13,9 @@ export function useStoreData(): UseStoreDataResult {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/reviews')
+    // Use absolute URL so it works regardless of the Vite base path
+    const apiBase = import.meta.env.VITE_API_BASE ?? ''
+    fetch(`${apiBase}/api/reviews`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<StoreData>

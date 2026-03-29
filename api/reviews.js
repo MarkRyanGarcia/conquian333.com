@@ -1,39 +1,14 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-import gplay from 'google-play-scraper'
+// @ts-check
+// Vercel serverless function — Node.js, ESM via dynamic import
 
 const APP_STORE_ID = '1069186374'
 const PLAY_STORE_ID = 'com.alexga.Conquian333'
 
-// Simple in-memory cache (resets on cold start, ~1hr TTL)
-let cache: { data: StoreData; ts: number } | null = null
 const CACHE_TTL = 60 * 60 * 1000 // 1 hour
+/** @type {{ data: any; ts: number } | null} */
+let cache = null
 
-export interface Review {
-  id: string
-  author: string
-  rating: number
-  text: string
-  date: string
-  source: 'appstore' | 'playstore'
-  avatar?: string
-}
-
-export interface StoreData {
-  appStore: {
-    rating: number
-    ratingCount: number
-    reviews: Review[]
-  }
-  playStore: {
-    rating: number
-    ratingCount: number
-    installs: string
-    reviews: Review[]
-  }
-}
-
-async function fetchAppStore(): Promise<StoreData['appStore']> {
-  // iTunes RSS feed — semi-official, no auth needed
+async function fetchAppStore() {
   const [ratingsRes, reviewsRes] = await Promise.all([
     fetch(`https://itunes.apple.com/lookup?id=${APP_STORE_ID}&country=us`),
     fetch(`https://itunes.apple.com/us/rss/customerreviews/id=${APP_STORE_ID}/sortBy=mostRecent/json`),
@@ -43,13 +18,11 @@ async function fetchAppStore(): Promise<StoreData['appStore']> {
   const reviewsJson = await reviewsRes.json()
 
   const appInfo = ratingsJson.results?.[0] ?? {}
-  const entries: any[] = reviewsJson.feed?.entry ?? []
+  const entries = reviewsJson.feed?.entry ?? []
+  const reviewEntries = entries.filter((/** @type {any} */ e) => e['im:rating'])
 
-  // First entry is app metadata, rest are reviews
-  const reviewEntries = entries.filter((e) => e['im:rating'])
-
-  const reviews: Review[] = reviewEntries.slice(0, 6).map((e) => ({
-    id: e.id?.label ?? Math.random().toString(),
+  const reviews = reviewEntries.slice(0, 6).map((/** @type {any} */ e) => ({
+    id: e.id?.label ?? String(Math.random()),
     author: e.author?.name?.label ?? 'Anonymous',
     rating: parseInt(e['im:rating']?.label ?? '5', 10),
     text: e.content?.label ?? '',
@@ -64,13 +37,16 @@ async function fetchAppStore(): Promise<StoreData['appStore']> {
   }
 }
 
-async function fetchPlayStore(): Promise<StoreData['playStore']> {
-  const [appInfo, reviews] = await Promise.all([
-    gplay.app({ appId: PLAY_STORE_ID }),
-    gplay.reviews({ appId: PLAY_STORE_ID, sort: 2, num: 6 }),
+async function fetchPlayStore() {
+  // Dynamic import for ESM-only package
+  const gplay = await import('google-play-scraper')
+
+  const [appInfo, reviewsResult] = await Promise.all([
+    gplay.default.app({ appId: PLAY_STORE_ID }),
+    gplay.default.reviews({ appId: PLAY_STORE_ID, sort: gplay.default.sort.NEWEST, num: 6 }),
   ])
 
-  const mappedReviews: Review[] = reviews.data.map((r) => ({
+  const reviews = reviewsResult.data.map((/** @type {any} */ r) => ({
     id: r.id,
     author: r.userName,
     rating: r.score,
@@ -84,12 +60,18 @@ async function fetchPlayStore(): Promise<StoreData['playStore']> {
     rating: appInfo.score ?? 0,
     ratingCount: appInfo.ratings ?? 0,
     installs: appInfo.installs ?? 'N/A',
-    reviews: mappedReviews,
+    reviews,
   }
 }
 
-export default async function handler(_req: VercelRequest, res: VercelResponse) {
-  // Return cached data if fresh
+/**
+ * @param {import('@vercel/node').VercelRequest} _req
+ * @param {import('@vercel/node').VercelResponse} res
+ */
+export default async function handler(_req, res) {
+  // CORS — allow the site origin
+  res.setHeader('Access-Control-Allow-Origin', '*')
+
   if (cache && Date.now() - cache.ts < CACHE_TTL) {
     return res.setHeader('X-Cache', 'HIT').json(cache.data)
   }
@@ -100,7 +82,7 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
       fetchPlayStore(),
     ])
 
-    const data: StoreData = { appStore, playStore }
+    const data = { appStore, playStore }
     cache = { data, ts: Date.now() }
 
     res
