@@ -1,14 +1,8 @@
-import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
 import { useStoreData } from '../hooks/useStoreData'
+import { useReveal } from '../hooks/useReveal'
 import type { Review } from '../types/storeData'
 
-gsap.registerPlugin(ScrollTrigger)
-
-// Static fallback reviews (shown while loading or on error)
 const STATIC_REVIEWS = [
   { authorKey: 'review_1_author', locationKey: 'review_1_location', textKey: 'review_1_text', avatar: './user1.jpg' },
   { authorKey: 'review_2_author', locationKey: 'review_2_location', textKey: 'review_2_text', avatar: './user2.jpg' },
@@ -27,7 +21,6 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-// Known total across both platforms (Apple doesn't expose download counts)
 const TOTAL_DOWNLOADS = '1.1M+'
 
 function StoreStats({ data }: { data: NonNullable<ReturnType<typeof useStoreData>['data']> }) {
@@ -36,47 +29,37 @@ function StoreStats({ data }: { data: NonNullable<ReturnType<typeof useStoreData
 
   return (
     <div className="flex flex-wrap justify-center gap-8 mb-12">
-      <div className="text-center">
-        <p className="text-4xl font-bold text-white">{TOTAL_DOWNLOADS}</p>
-        <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>downloads</p>
-      </div>
-      <div className="text-center">
-        <p className="text-4xl font-bold text-white">{avgRating}</p>
-        <StarRating rating={parseFloat(avgRating)} />
-        <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>avg rating</p>
-      </div>
-      <div className="text-center">
-        <p className="text-4xl font-bold text-white">{totalRatings}</p>
-        <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>total ratings</p>
-      </div>
-      <div className="text-center">
-        <p className="text-4xl font-bold text-white">{data.appStore.rating.toFixed(1)}</p>
-        <StarRating rating={data.appStore.rating} />
-        <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>App Store</p>
-      </div>
-      <div className="text-center">
-        <p className="text-4xl font-bold text-white">{data.playStore.rating.toFixed(1)}</p>
-        <StarRating rating={data.playStore.rating} />
-        <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>Google Play</p>
-      </div>
+      {[
+        { value: TOTAL_DOWNLOADS, label: 'downloads' },
+        { value: avgRating, label: 'avg rating', rating: parseFloat(avgRating) },
+        { value: totalRatings, label: 'total ratings' },
+        { value: data.appStore.rating.toFixed(1), label: 'App Store', rating: data.appStore.rating },
+        { value: data.playStore.rating.toFixed(1), label: 'Google Play', rating: data.playStore.rating },
+      ].map((stat) => (
+        <div key={stat.label} className="text-center">
+          <p className="text-4xl font-bold text-white">{stat.value}</p>
+          {stat.rating !== undefined && <StarRating rating={stat.rating} />}
+          <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>{stat.label}</p>
+        </div>
+      ))}
     </div>
   )
 }
 
-function LiveReviewCard({ review, refCb }: { review: Review; refCb: (el: HTMLDivElement | null) => void }) {
+function LiveReviewCard({ review }: { review: Review }) {
   const initials = review.author.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
   const date = review.date ? new Date(review.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : ''
-  const sourceBadge = review.source === 'appstore' ? '🍎' : '▶'
 
   return (
     <div
-      ref={refCb}
       className="flex flex-col gap-3 rounded-2xl p-6"
       style={{ background: 'rgba(0, 104, 71, 0.35)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-offwhite)' }}
     >
       <div className="flex items-center justify-between">
         <StarRating rating={review.rating} />
-        <span className="text-xs" style={{ color: 'var(--color-offwhite-2)' }}>{sourceBadge} {date}</span>
+        <span className="text-xs" style={{ color: 'var(--color-offwhite-2)' }}>
+          {review.source === 'appstore' ? '🍎' : '▶'} {date}
+        </span>
       </div>
       <p className="text-sm italic flex-1">"{review.text}"</p>
       <div className="flex items-center gap-3 mt-auto">
@@ -92,73 +75,50 @@ function LiveReviewCard({ review, refCb }: { review: Review; refCb: (el: HTMLDiv
 
 export default function Reviews() {
   const { t } = useTranslation()
-  const { data, loading } = useStoreData()
-  const sectionRef = useRef<HTMLElement>(null)
-  const cardRefs = useRef<HTMLDivElement[]>([])
+  const { data } = useStoreData()
+  const headingRef = useReveal()
+  const statsRef = useReveal()
+  const staticGridRef = useReveal()
+  const liveGridRef = useReveal()
 
-  useGSAP(() => {
-    if (cardRefs.current.length === 0) return
-    gsap.from(cardRefs.current, {
-      opacity: 0,
-      y: 40,
-      stagger: 0.15,
-      duration: 0.7,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
-    })
-  }, { scope: sectionRef, dependencies: [loading] })
-
-  // Static reviews always shown first, then live 4+ star reviews from stores
   const liveReviews: Review[] = data
     ? [...data.appStore.reviews, ...data.playStore.reviews].filter((r) => r.rating >= 4)
     : []
 
-  // Static card component (featured, always visible)
-  const StaticCard = ({ review, idx }: { review: typeof STATIC_REVIEWS[0]; idx: number }) => (
-    <div
-      ref={(el) => { if (el) cardRefs.current[idx] = el }}
-      className="flex flex-col gap-3 rounded-2xl p-6 relative"
-      style={{
-        background: 'rgba(0, 104, 71, 0.55)',
-        border: '1px solid rgba(255,255,255,0.35)',
-        color: 'var(--color-offwhite)',
-      }}
-    >
-      <StarRating rating={5} />
-      <p className="text-sm italic flex-1">"{t(review.textKey)}"</p>
-      <div className="flex items-center gap-3 mt-auto">
-        <img src={review.avatar} alt={t(review.authorKey)} className="w-10 h-10 rounded-full object-cover" style={{ border: '2px solid rgba(255,255,255,0.4)' }} />
-        <div>
-          <p className="font-bold text-sm">{t(review.authorKey)}</p>
-          <p className="text-xs" style={{ color: 'var(--color-offwhite-2)' }}>{t(review.locationKey)}</p>
-        </div>
-      </div>
-    </div>
-  )
-
   return (
-    <section id="reviews" ref={sectionRef} className="relative max-w-5xl mx-auto pt-20 px-5">
-      <h2 className="text-3xl font-bold text-center mb-10">{t('reviews_heading')}</h2>
+    <section id="reviews" className="relative max-w-5xl mx-auto pt-20 px-5">
+      <h2 ref={headingRef} className="text-3xl font-bold text-center mb-10 reveal">{t('reviews_heading')}</h2>
 
-      {/* Live stats bar */}
-      {data && <StoreStats data={data} />}
+      {data && (
+        <div ref={statsRef} className="reveal">
+          <StoreStats data={data} />
+        </div>
+      )}
 
-      {/* Featured static reviews — always at top */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {STATIC_REVIEWS.map((review, i) => (
-          <StaticCard key={review.authorKey} review={review} idx={i} />
+      <div ref={staticGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 reveal-stagger">
+        {STATIC_REVIEWS.map((review) => (
+          <div
+            key={review.authorKey}
+            className="flex flex-col gap-3 rounded-2xl p-6"
+            style={{ background: 'rgba(0, 104, 71, 0.55)', border: '1px solid rgba(255,255,255,0.35)', color: 'var(--color-offwhite)' }}
+          >
+            <StarRating rating={5} />
+            <p className="text-sm italic flex-1">"{t(review.textKey)}"</p>
+            <div className="flex items-center gap-3 mt-auto">
+              <img src={review.avatar} alt={t(review.authorKey)} className="w-10 h-10 rounded-full object-cover" style={{ border: '2px solid rgba(255,255,255,0.4)' }} />
+              <div>
+                <p className="font-bold text-sm">{t(review.authorKey)}</p>
+                <p className="text-xs" style={{ color: 'var(--color-offwhite-2)' }}>{t(review.locationKey)}</p>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Live store reviews — 4+ stars only */}
       {liveReviews.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {liveReviews.map((review, i) => (
-            <LiveReviewCard
-              key={review.id}
-              review={review}
-              refCb={(el) => { if (el) cardRefs.current[STATIC_REVIEWS.length + i] = el }}
-            />
+        <div ref={liveGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-stagger">
+          {liveReviews.map((review) => (
+            <LiveReviewCard key={review.id} review={review} />
           ))}
         </div>
       )}

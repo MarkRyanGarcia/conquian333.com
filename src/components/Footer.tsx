@@ -7,7 +7,7 @@ const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.alexga.Co
 
 export default function Footer() {
   const { t } = useTranslation()
-  const { smoother } = useContext(SmootherContext)
+  const { scrollTo } = useContext(SmootherContext)
 
   return (
     <footer
@@ -28,13 +28,13 @@ export default function Footer() {
       <div className="flex justify-center gap-6 text-sm mb-6">
         <button
           className="hover:text-white transition-colors cursor-pointer"
-          onClick={() => smoother?.scrollTo('#tutorial', true)}
+          onClick={() => scrollTo('#tutorial')}
         >
           {t('tutorial')}
         </button>
         <button
           className="hover:text-white transition-colors cursor-pointer"
-          onClick={() => smoother?.scrollTo('#reviews', true)}
+          onClick={() => scrollTo('#reviews')}
         >
           {t('reviews')}
         </button>

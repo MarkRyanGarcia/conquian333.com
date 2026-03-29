@@ -14,28 +14,38 @@ const PLAY_STORE_ID = 'com.alexga.Conquian333'
 
 async function fetchAppStore() {
   try {
-    const [ratingsRes, reviewsRes] = await Promise.all([
+    // Fetch multiple pages to find enough 4-5 star reviews
+    const [ratingsRes, page1Res, page2Res] = await Promise.all([
       fetch(`https://itunes.apple.com/lookup?id=${APP_STORE_ID}&country=us`),
-      fetch(`https://itunes.apple.com/us/rss/customerreviews/id=${APP_STORE_ID}/sortBy=mostRecent/json`),
+      fetch(`https://itunes.apple.com/us/rss/customerreviews/id=${APP_STORE_ID}/sortBy=mostRecent/page=1/json`),
+      fetch(`https://itunes.apple.com/us/rss/customerreviews/id=${APP_STORE_ID}/sortBy=mostRecent/page=2/json`),
     ])
     const ratingsJson = await ratingsRes.json()
-    const reviewsJson = await reviewsRes.json()
+    const page1Json = await page1Res.json()
+    const page2Json = await page2Res.json()
 
     const appInfo = ratingsJson.results?.[0] ?? {}
-    const entries = reviewsJson.feed?.entry ?? []
-    const reviewEntries = entries.filter((e) => e['im:rating'])
+    const entries = [
+      ...(page1Json.feed?.entry ?? []),
+      ...(page2Json.feed?.entry ?? []),
+    ].filter((e) => e['im:rating'])
 
-    return {
-      rating: parseFloat(appInfo.averageUserRating ?? '0'),
-      ratingCount: appInfo.userRatingCount ?? 0,
-      reviews: reviewEntries.slice(0, 6).map((e) => ({
+    const goodReviews = entries
+      .filter((e) => parseInt(e['im:rating']?.label ?? '0', 10) >= 4)
+      .slice(0, 8)
+      .map((e) => ({
         id: e.id?.label ?? String(Math.random()),
         author: e.author?.name?.label ?? 'Anonymous',
         rating: parseInt(e['im:rating']?.label ?? '5', 10),
         text: e.content?.label ?? '',
         date: e.updated?.label ?? '',
         source: 'appstore',
-      })),
+      }))
+
+    return {
+      rating: parseFloat(appInfo.averageUserRating ?? '0'),
+      ratingCount: appInfo.userRatingCount ?? 0,
+      reviews: goodReviews,
     }
   } catch (e) {
     console.warn('App Store fetch failed:', e.message)
@@ -50,14 +60,13 @@ async function fetchPlayStore() {
 
     const [appInfo, reviewsResult] = await Promise.all([
       g.app({ appId: PLAY_STORE_ID }),
-      g.reviews({ appId: PLAY_STORE_ID, sort: g.sort.NEWEST, num: 6 }),
+      g.reviews({ appId: PLAY_STORE_ID, sort: g.sort.RATING, num: 50 }),
     ])
 
-    return {
-      rating: appInfo.score ?? 0,
-      ratingCount: appInfo.ratings ?? 0,
-      installs: appInfo.installs ?? 'N/A',
-      reviews: reviewsResult.data.map((r) => ({
+    const goodReviews = reviewsResult.data
+      .filter((r) => r.score >= 4)
+      .slice(0, 8)
+      .map((r) => ({
         id: r.id,
         author: r.userName,
         rating: r.score,
@@ -65,7 +74,13 @@ async function fetchPlayStore() {
         date: r.date ? new Date(r.date).toISOString() : '',
         source: 'playstore',
         avatar: r.userImage ?? undefined,
-      })),
+      }))
+
+    return {
+      rating: appInfo.score ?? 0,
+      ratingCount: appInfo.ratings ?? 0,
+      installs: appInfo.installs ?? 'N/A',
+      reviews: goodReviews,
     }
   } catch (e) {
     console.warn('Play Store fetch failed:', e.message)

@@ -13,7 +13,7 @@ export function useStoreData(): UseStoreDataResult {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/app/v2/api/reviews.json')
+    fetch('/api/reviews.json')
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<StoreData>
