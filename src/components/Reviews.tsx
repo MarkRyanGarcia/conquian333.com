@@ -105,10 +105,33 @@ export default function Reviews() {
     })
   }, { scope: sectionRef, dependencies: [loading] })
 
-  // Merge and interleave reviews from both stores (max 6)
+  // Static reviews always shown first, then live 4+ star reviews from stores
   const liveReviews: Review[] = data
-    ? [...data.appStore.reviews.slice(0, 3), ...data.playStore.reviews.slice(0, 3)]
+    ? [...data.appStore.reviews, ...data.playStore.reviews].filter((r) => r.rating >= 4)
     : []
+
+  // Static card component (featured, always visible)
+  const StaticCard = ({ review, idx }: { review: typeof STATIC_REVIEWS[0]; idx: number }) => (
+    <div
+      ref={(el) => { if (el) cardRefs.current[idx] = el }}
+      className="flex flex-col gap-3 rounded-2xl p-6 relative"
+      style={{
+        background: 'rgba(0, 104, 71, 0.55)',
+        border: '1px solid rgba(255,255,255,0.35)',
+        color: 'var(--color-offwhite)',
+      }}
+    >
+      <StarRating rating={5} />
+      <p className="text-sm italic flex-1">"{t(review.textKey)}"</p>
+      <div className="flex items-center gap-3 mt-auto">
+        <img src={review.avatar} alt={t(review.authorKey)} className="w-10 h-10 rounded-full object-cover" style={{ border: '2px solid rgba(255,255,255,0.4)' }} />
+        <div>
+          <p className="font-bold text-sm">{t(review.authorKey)}</p>
+          <p className="text-xs" style={{ color: 'var(--color-offwhite-2)' }}>{t(review.locationKey)}</p>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <section id="reviews" ref={sectionRef} className="relative max-w-5xl mx-auto pt-20 px-5">
@@ -117,35 +140,25 @@ export default function Reviews() {
       {/* Live stats bar */}
       {data && <StoreStats data={data} />}
 
-      {/* Review cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {liveReviews.length > 0
-          ? liveReviews.map((review, i) => (
-              <LiveReviewCard
-                key={review.id}
-                review={review}
-                refCb={(el) => { if (el) cardRefs.current[i] = el }}
-              />
-            ))
-          : STATIC_REVIEWS.map((review, i) => (
-              <div
-                key={review.authorKey}
-                ref={(el) => { if (el) cardRefs.current[i] = el }}
-                className="flex flex-col gap-3 rounded-2xl p-6"
-                style={{ background: 'rgba(0, 104, 71, 0.35)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-offwhite)' }}
-              >
-                <p className="text-sm italic">"{t(review.textKey)}"</p>
-                <div className="flex items-center gap-3 mt-2">
-                  <img src={review.avatar} alt={t(review.authorKey)} className="w-10 h-10 rounded-full object-cover" style={{ border: '2px solid rgba(255,255,255,0.3)' }} />
-                  <div>
-                    <p className="font-bold text-sm">{t(review.authorKey)}</p>
-                    <p className="text-xs" style={{ color: 'var(--color-offwhite-2)' }}>{t(review.locationKey)}</p>
-                  </div>
-                </div>
-              </div>
-            ))
-        }
+      {/* Featured static reviews — always at top */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {STATIC_REVIEWS.map((review, i) => (
+          <StaticCard key={review.authorKey} review={review} idx={i} />
+        ))}
       </div>
+
+      {/* Live store reviews — 4+ stars only */}
+      {liveReviews.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {liveReviews.map((review, i) => (
+            <LiveReviewCard
+              key={review.id}
+              review={review}
+              refCb={(el) => { if (el) cardRefs.current[STATIC_REVIEWS.length + i] = el }}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
