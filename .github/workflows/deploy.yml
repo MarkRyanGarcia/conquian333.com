@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  schedule:
+    # Rebuild daily at 3am UTC to refresh store data
+    - cron: '0 3 * * *'
 
 jobs:
   build-and-deploy:
