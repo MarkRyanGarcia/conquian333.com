@@ -7,10 +7,25 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '../public/api')
+const AVATARS_DIR = join(__dirname, '../public/api/avatars')
 const OUT_FILE = join(OUT_DIR, 'reviews.json')
 
 const APP_STORE_ID = '1069186374'
 const PLAY_STORE_ID = 'com.alexga.Conquian333'
+
+async function downloadAvatar(url, id) {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return undefined
+    const buf = Buffer.from(await res.arrayBuffer())
+    const ext = url.includes('.png') ? 'png' : 'jpg'
+    const filename = `${id}.${ext}`
+    writeFileSync(join(AVATARS_DIR, filename), buf)
+    return `/app/v2/api/avatars/${filename}`
+  } catch {
+    return undefined
+  }
+}
 
 async function fetchAppStore() {
   try {
@@ -66,21 +81,28 @@ async function fetchPlayStore() {
     const goodReviews = reviewsResult.data
       .filter((r) => r.score >= 4)
       .slice(0, 8)
-      .map((r) => ({
-        id: r.id,
-        author: r.userName,
-        rating: r.score,
-        text: r.text ?? '',
-        date: r.date ? new Date(r.date).toISOString() : '',
-        source: 'playstore',
-        avatar: r.userImage ?? undefined,
-      }))
+
+    // Download avatars locally to avoid CORS issues
+    const reviewsWithAvatars = await Promise.all(
+      goodReviews.map(async (r) => {
+        const localAvatar = r.userImage ? await downloadAvatar(r.userImage, r.id) : undefined
+        return {
+          id: r.id,
+          author: r.userName,
+          rating: r.score,
+          text: r.text ?? '',
+          date: r.date ? new Date(r.date).toISOString() : '',
+          source: 'playstore',
+          avatar: localAvatar,
+        }
+      })
+    )
 
     return {
       rating: appInfo.score ?? 0,
       ratingCount: appInfo.ratings ?? 0,
       installs: appInfo.installs ?? 'N/A',
-      reviews: goodReviews,
+      reviews: reviewsWithAvatars,
     }
   } catch (e) {
     console.warn('Play Store fetch failed:', e.message)
@@ -89,6 +111,7 @@ async function fetchPlayStore() {
 }
 
 console.log('Fetching store data...')
+mkdirSync(AVATARS_DIR, { recursive: true })
 const [appStore, playStore] = await Promise.all([fetchAppStore(), fetchPlayStore()])
 const data = { appStore, playStore, generatedAt: new Date().toISOString() }
 

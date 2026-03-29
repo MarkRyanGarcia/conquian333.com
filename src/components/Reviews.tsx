@@ -49,7 +49,7 @@ function StoreStats({ data }: { data: NonNullable<ReturnType<typeof useStoreData
 function LiveReviewCard({ review }: { review: Review }) {
   const initials = review.author.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
   const date = review.date ? new Date(review.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : ''
-
+  console.log(review)
   return (
     <div
       className="flex flex-col gap-3 rounded-2xl p-6"
@@ -82,18 +82,16 @@ export default function Reviews() {
   const liveGridRef = useReveal()
 
   const liveReviews: Review[] = data
-    ? [...data.appStore.reviews, ...data.playStore.reviews].filter((r) => r.rating >= 4)
+    ? [...data.appStore.reviews, ...data.playStore.reviews].filter((r) => r.rating >= 4).slice(0, 6)
     : []
 
   return (
     <section id="reviews" className="relative max-w-5xl mx-auto pt-20 px-5">
       <h2 ref={headingRef} className="text-3xl font-bold text-center mb-10 reveal">{t('reviews_heading')}</h2>
 
-      {data && (
-        <div ref={statsRef} className="reveal">
-          <StoreStats data={data} />
-        </div>
-      )}
+      <div ref={statsRef} className={`reveal${!data ? ' hidden' : ''}`}>
+        {data && <StoreStats data={data} />}
+      </div>
 
       <div ref={staticGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 reveal-stagger">
         {STATIC_REVIEWS.map((review) => (
@@ -115,13 +113,11 @@ export default function Reviews() {
         ))}
       </div>
 
-      {liveReviews.length > 0 && (
-        <div ref={liveGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-stagger">
-          {liveReviews.map((review) => (
-            <LiveReviewCard key={review.id} review={review} />
-          ))}
-        </div>
-      )}
+      <div ref={liveGridRef} className={`grid grid-cols-1 md:grid-cols-3 gap-6 reveal-stagger${liveReviews.length === 0 ? ' hidden' : ''}`}>
+        {liveReviews.map((review) => (
+          <LiveReviewCard key={review.id} review={review} />
+        ))}
+      </div>
     </section>
   )
 }
