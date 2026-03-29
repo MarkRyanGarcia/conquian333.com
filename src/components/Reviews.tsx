@@ -7,9 +7,9 @@ import { useGSAP } from '@gsap/react'
 gsap.registerPlugin(ScrollTrigger)
 
 const REVIEWS = [
-  { authorKey: 'review_1_author', locationKey: 'review_1_location', textKey: 'review_1_text' },
-  { authorKey: 'review_2_author', locationKey: 'review_2_location', textKey: 'review_2_text' },
-  { authorKey: 'review_3_author', locationKey: 'review_3_location', textKey: 'review_3_text' },
+  { authorKey: 'review_1_author', locationKey: 'review_1_location', textKey: 'review_1_text', avatar: './user1.jpg' },
+  { authorKey: 'review_2_author', locationKey: 'review_2_location', textKey: 'review_2_text', avatar: './user2.jpg' },
+  { authorKey: 'review_3_author', locationKey: 'review_3_location', textKey: 'review_3_text', avatar: './user3.jpg' },
 ]
 
 export default function Reviews() {
@@ -54,10 +54,20 @@ export default function Reviews() {
             }}
           >
             <p className="text-sm italic">"{t(review.textKey)}"</p>
-            <p className="font-bold">{t(review.authorKey)}</p>
-            <p className="text-sm" style={{ color: 'var(--color-offwhite-2)' }}>
-              {t(review.locationKey)}
-            </p>
+            <div className="flex items-center gap-3 mt-2">
+              <img
+                src={review.avatar}
+                alt={t(review.authorKey)}
+                className="w-10 h-10 rounded-full object-cover"
+                style={{ border: '2px solid rgba(255,255,255,0.3)' }}
+              />
+              <div>
+                <p className="font-bold text-sm">{t(review.authorKey)}</p>
+                <p className="text-xs" style={{ color: 'var(--color-offwhite-2)' }}>
+                  {t(review.locationKey)}
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>

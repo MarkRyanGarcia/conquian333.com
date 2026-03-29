@@ -111,6 +111,7 @@ export default function NavHero() {
                         {t('reviews')}
                     </button>
 
+
                     <div className="flex items-center bg-white/10 rounded-lg px-2 py-1 border border-white/20">
                         <select
                             onChange={(e) => changeLanguage(e.target.value)}
@@ -123,7 +124,7 @@ export default function NavHero() {
                         <span className="text-white/40 text-xs pointer-events-none">▼</span>
                     </div>
 
-                    <DownloadButton onClick={() => window.open(getPlatformStoreUrl(), '_blank')}>{t('cta_label')}</DownloadButton>
+                    <DownloadButton onClick={() => smoother?.scrollTo('#download', true)}>{t('download')}</DownloadButton>
                 </div>
             </div>
         </nav>
