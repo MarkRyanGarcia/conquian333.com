@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import DownloadButton from "./DownloadButton";
 import { gsap } from 'gsap';
 import { SmootherContext } from "../context/SmootherContext";
-import { getPlatformStoreUrl } from "../utils/platform";
 
 export default function NavHero() {
     const { t, i18n } = useTranslation();

@@ -67,7 +67,7 @@ async function fetchAppStore(): Promise<StoreData['appStore']> {
 async function fetchPlayStore(): Promise<StoreData['playStore']> {
   const [appInfo, reviews] = await Promise.all([
     gplay.app({ appId: PLAY_STORE_ID }),
-    gplay.reviews({ appId: PLAY_STORE_ID, sort: gplay.sort.NEWEST, num: 6 }),
+    gplay.reviews({ appId: PLAY_STORE_ID, sort: 2, num: 6 }),
   ])
 
   const mappedReviews: Review[] = reviews.data.map((r) => ({
