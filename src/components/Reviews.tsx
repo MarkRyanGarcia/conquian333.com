@@ -27,12 +27,19 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
+// Known total across both platforms (Apple doesn't expose download counts)
+const TOTAL_DOWNLOADS = '1.1M+'
+
 function StoreStats({ data }: { data: NonNullable<ReturnType<typeof useStoreData>['data']> }) {
   const avgRating = ((data.appStore.rating + data.playStore.rating) / 2).toFixed(1)
   const totalRatings = (data.appStore.ratingCount + data.playStore.ratingCount).toLocaleString()
 
   return (
     <div className="flex flex-wrap justify-center gap-8 mb-12">
+      <div className="text-center">
+        <p className="text-4xl font-bold text-white">{TOTAL_DOWNLOADS}</p>
+        <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>downloads</p>
+      </div>
       <div className="text-center">
         <p className="text-4xl font-bold text-white">{avgRating}</p>
         <StarRating rating={parseFloat(avgRating)} />
@@ -41,10 +48,6 @@ function StoreStats({ data }: { data: NonNullable<ReturnType<typeof useStoreData
       <div className="text-center">
         <p className="text-4xl font-bold text-white">{totalRatings}</p>
         <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>total ratings</p>
-      </div>
-      <div className="text-center">
-        <p className="text-4xl font-bold text-white">{data.playStore.installs}</p>
-        <p className="text-xs mt-1" style={{ color: 'var(--color-offwhite-2)' }}>installs</p>
       </div>
       <div className="text-center">
         <p className="text-4xl font-bold text-white">{data.appStore.rating.toFixed(1)}</p>
