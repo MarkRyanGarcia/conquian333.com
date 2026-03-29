@@ -9,14 +9,21 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Different() {
     const { t } = useTranslation();
     const desc = useRef(null)
+    const imgRef = useRef(null)
+    const textRef = useRef(null)
+
     useGSAP(
         () => {
-            ScrollTrigger.create({
-                trigger: '.header',
-                start: 'middle top',
-                end: '+=100',
-                pin: false,
-                markers: false,
+            gsap.from([imgRef.current, textRef.current], {
+                opacity: 0,
+                x: -30,
+                stagger: 0.15,
+                duration: 0.6,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: desc.current,
+                    start: "top 75%",
+                }
             });
         },
         { scope: desc }
@@ -26,8 +33,8 @@ export default function Different() {
         <section title='different' className='relative flex flex-col max-w-5xl justify-center pt-70 md:pt-227 items-center mx-auto pointer-events-none'>
             <main ref={desc}>
                 <div className='header flex flex-col-reverse md:flex-row gap-10 justify-between items-center w-full mx-auto'>
-                    <img src='./02.png' className='phone w-100'></img>
-                    <div className='flex flex-col gap-2 p-5'>
+                    <img ref={imgRef} src='./02.png' className='phone w-100'></img>
+                    <div ref={textRef} className='flex flex-col gap-2 p-5'>
                         <h2 className='w-full text-3xl font-bold'>
                             {t("conquian_is_different")}
                         </h2>

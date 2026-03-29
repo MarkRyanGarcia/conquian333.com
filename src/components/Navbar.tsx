@@ -1,10 +1,13 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import DownloadButton from "./DownloadButton";
 import { gsap } from 'gsap';
+import { SmootherContext } from "../context/SmootherContext";
+import { getPlatformStoreUrl } from "../utils/platform";
 
 export default function NavHero() {
     const { t, i18n } = useTranslation();
+    const { smoother } = useContext(SmootherContext);
     const heroRef = useRef<HTMLDivElement>(null);
     const logoRef = useRef<HTMLDivElement>(null);
     const buttonsRef = useRef<HTMLDivElement>(null);
@@ -94,8 +97,18 @@ export default function NavHero() {
                     ref={buttonsRef}
                     className="mt-6 flex flex-nowrap gap-3 sm:gap-6 font-bold items-center justify-center w-full"
                 >
-                    <button className="text-white/80 hover:text-white text-xs sm:text-base cursor-pointer">
+                    <button
+                        className="text-white/80 hover:text-white text-xs sm:text-base cursor-pointer"
+                        onClick={() => smoother?.scrollTo('#tutorial', true)}
+                    >
                         {t('tutorial')}
+                    </button>
+
+                    <button
+                        className="text-white/80 hover:text-white text-xs sm:text-base cursor-pointer"
+                        onClick={() => smoother?.scrollTo('#reviews', true)}
+                    >
+                        {t('reviews')}
                     </button>
 
                     <div className="flex items-center bg-white/10 rounded-lg px-2 py-1 border border-white/20">
@@ -110,7 +123,7 @@ export default function NavHero() {
                         <span className="text-white/40 text-xs pointer-events-none">▼</span>
                     </div>
 
-                    <DownloadButton>{t('download')}</DownloadButton>
+                    <DownloadButton onClick={() => window.open(getPlatformStoreUrl(), '_blank')}>{t('cta_label')}</DownloadButton>
                 </div>
             </div>
         </nav>

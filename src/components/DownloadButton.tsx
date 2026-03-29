@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
+import React from "react";
 
-export default function DownloadButton({ children }: any) {
+export default function DownloadButton({ children, onClick }: { children?: React.ReactNode; onClick?: () => void }) {
     const [coords, setCoords] = useState({ x: -1, y: -1 });
     const [isHovering, setIsHovering] = useState(false);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -22,6 +23,7 @@ export default function DownloadButton({ children }: any) {
             ref={buttonRef}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={() => setIsHovering(false)}
+            onClick={onClick}
             className="relative px-6 py-1 rounded-full overflow-hidden border-2 border-offwhite group cursor-pointer"
         >
             <span className="relative z-10 transition-colors duration-200 group-hover:text-black">

@@ -9,14 +9,22 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Hero() {
     const { t } = useTranslation();
     const desc = useRef(null)
+    const textRef = useRef(null)
+    const imgRef = useRef(null)
+
     useGSAP(
         () => {
-            ScrollTrigger.create({
-                trigger: '.header',
-                start: 'middle top',
-                end: '+=100',
-                pin: false,
-                markers: false,
+            gsap.from([textRef.current, imgRef.current], {
+                opacity: 0,
+                y: 40,
+                stagger: 0.15,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: desc.current,
+                    start: "top 80%",
+                    markers: false,
+                }
             });
         },
         { scope: desc }
@@ -26,7 +34,7 @@ export default function Hero() {
         <section title='hero' className='relative flex flex-col max-w-5xl justify-center pt-70 md:pt-200 items-center mx-auto pointer-events-none'>
             <main ref={desc}>
                 <div className='header flex flex-col md:flex-row gap-10 justify-between items-center w-full mx-auto' data-speed={0.4}>
-                    <div className='flex flex-col gap-2 p-5'>
+                    <div ref={textRef} className='flex flex-col gap-2 p-5'>
                         <h2 className='w-full text-3xl font-bold'>
                             {t("the_classic_card_game")}
                         </h2>
@@ -45,10 +53,9 @@ export default function Hero() {
                             </li>
                         </ul>
                     </div>
-                    <img src='./01.png' className='phone w-100'></img>
+                    <img ref={imgRef} src='./01.png' className='phone w-100'></img>
                 </div>
             </main>
         </section>
     )
 }
-
